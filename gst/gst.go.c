@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "gst.go.h"
 
 GType                  objectGType            (GObject *obj) { return G_OBJECT_TYPE(obj); };
@@ -157,6 +158,7 @@ GstTagSetter *  toTagSetter (GstElement *elem)  { return GST_TAG_SETTER(elem); }
 
 GstSample * getSampleValue (GValue * val)
 {
+    printf("getSampleValue %p", val);
 	return gst_value_get_sample(val);
 }
 
