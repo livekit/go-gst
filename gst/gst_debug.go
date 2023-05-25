@@ -4,13 +4,13 @@ package gst
 #include "gst.go.h"
 
 extern void goLogFunction(GstDebugCategory * category,
-                        GstDebugLevel level,
-                        const gchar * file,
-                        const gchar * function,
-                        gint line,
-                        GObject * object,
-                        GstDebugMessage * message,
-                        gpointer user_data) G_GNUC_NO_INSTRUMENT;
+                          GstDebugLevel level,
+                          const gchar * file,
+                          const gchar * function,
+                          gint line,
+                          GObject * object,
+                          GstDebugMessage * message,
+                          gpointer user_data) G_GNUC_NO_INSTRUMENT;
 
 void cgoDebugLog (GstDebugCategory * category,
                	  GstDebugLevel level,
@@ -202,11 +202,8 @@ var customLogFunction LogFunction
 func SetLogFunction(f LogFunction) {
 	if f == nil {
 		C.cgoUnsetLogFunction()
-		customLogFunction = nil
-	} else {
-		customLogFunction = f
-		if customLogFunction == nil {
-			C.cgoSetLogFunction()
-		}
+	} else if customLogFunction == nil {
+		C.cgoSetLogFunction()
 	}
+	customLogFunction = f
 }

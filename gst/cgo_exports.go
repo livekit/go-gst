@@ -245,14 +245,16 @@ func goGlobalPluginInit(plugin *C.GstPlugin) C.gboolean {
 }
 
 //export goLogFunction
-func goLogFunction(category *C.GstDebugCategory,
+func goLogFunction(
+	category *C.GstDebugCategory,
 	level C.GstDebugLevel,
 	file *C.gchar,
 	function *C.gchar,
 	line C.gint,
 	object *C.GObject,
 	message *C.GstDebugMessage,
-	userData C.gpointer) {
+	userData C.gpointer,
+) {
 	if f := customLogFunction; f != nil {
 		f(
 			DebugLevel(level),
