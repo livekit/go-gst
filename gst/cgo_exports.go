@@ -256,12 +256,16 @@ func goLogFunction(
 	userData C.gpointer,
 ) {
 	if f := customLogFunction; f != nil {
+		var obj *glib.Object
+		if object != nil {
+			obj = glib.TransferNone(unsafe.Pointer(object))
+		}
 		f(
 			DebugLevel(level),
 			C.GoString(file),
 			C.GoString(function),
 			int(line),
-			glib.TransferNone(unsafe.Pointer(object)),
+			obj,
 			C.GoString(C.gst_debug_message_get(message)),
 		)
 	}
