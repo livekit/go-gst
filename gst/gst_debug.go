@@ -26,13 +26,13 @@ void cgoDebugLog (GstDebugCategory * category,
 void cgoSetLogFunction()
 {
 	gst_debug_remove_log_function(gst_debug_log_default);
-	gst_debug_add_log_function(goLogFunction, NULL);
+	gst_debug_add_log_function(goLogFunction, NULL, NULL);
 }
 
 void cgoUnsetLogFunction()
 {
 	gst_debug_remove_log_function(goLogFunction);
-	gst_debug_add_log_function(gst_debug_log_default, NULL);
+	gst_debug_add_log_function(gst_debug_log_default, NULL, NULL);
 }
 
 */
