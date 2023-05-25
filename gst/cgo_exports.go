@@ -261,7 +261,7 @@ func goLogFunction(
 			C.GoString(file),
 			C.GoString(function),
 			int(line),
-			&glib.Object{GObject: object},
+			glib.TransferNone(unsafe.Pointer(object)),
 			C.GoString(C.gst_debug_message_get(message)),
 		)
 	}
