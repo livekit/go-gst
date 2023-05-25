@@ -259,7 +259,7 @@ func goLogFunction(category *C.GstDebugCategory,
 			C.GoString(file),
 			C.GoString(function),
 			int(line),
-			glib.ToGObject(unsafe.Pointer(object)),
+			&glib.Object{GObject: object},
 			C.GoString(C.gst_debug_message_get(message)),
 		)
 	}
