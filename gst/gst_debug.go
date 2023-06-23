@@ -199,13 +199,13 @@ type LogFunction func(
 )
 
 var (
-	logMu             sync.Mutex
+	logFnMu           sync.RWMutex
 	customLogFunction LogFunction
 )
 
 func SetLogFunction(f LogFunction) {
-	logMu.Lock()
-	defer logMu.Unlock()
+	logFnMu.Lock()
+	defer logFnMu.Unlock()
 
 	if f == nil {
 		C.cgoResetLogFunction()

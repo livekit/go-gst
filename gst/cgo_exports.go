@@ -255,7 +255,11 @@ func goLogFunction(
 	message *C.GstDebugMessage,
 	_ C.gpointer,
 ) {
-	if f := customLogFunction; f != nil {
+	logFnMu.RLock()
+	f := customLogFunction
+	logFnMu.RUnlock()
+
+	if f != nil {
 		var obj *glib.Object
 		if object != nil {
 			obj = glib.TransferNone(unsafe.Pointer(object))
