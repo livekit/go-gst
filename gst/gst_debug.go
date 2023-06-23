@@ -29,7 +29,7 @@ void cgoSetLogFunction()
 	gst_debug_add_log_function(goLogFunction, NULL, NULL);
 }
 
-void cgoUnsetLogFunction()
+void cgoResetLogFunction()
 {
 	gst_debug_remove_log_function(goLogFunction);
 	gst_debug_add_log_function(gst_debug_log_default, NULL, NULL);
@@ -40,6 +40,7 @@ import "C"
 import (
 	"path"
 	"runtime"
+	"sync"
 	"unsafe"
 
 	"github.com/tinyzimmer/go-glib/glib"
@@ -197,9 +198,15 @@ type LogFunction func(
 	message string,
 )
 
-var customLogFunction LogFunction
+var (
+	logMu             sync.Mutex
+	customLogFunction LogFunction
+)
 
 func SetLogFunction(f LogFunction) {
+	logMu.Lock()
+	defer logMu.Unlock()
+
 	if f == nil {
 		C.cgoUnsetLogFunction()
 	} else if customLogFunction == nil {
