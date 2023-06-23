@@ -208,7 +208,7 @@ func SetLogFunction(f LogFunction) {
 	defer logMu.Unlock()
 
 	if f == nil {
-		C.cgoUnsetLogFunction()
+		C.cgoResetLogFunction()
 	} else if customLogFunction == nil {
 		C.cgoSetLogFunction()
 	}
