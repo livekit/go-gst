@@ -139,6 +139,17 @@ func (s *Structure) GetValue(key string) (interface{}, error) {
 	return glib.ValueFromNative(unsafe.Pointer(gVal)).GoValue()
 }
 
+// GetArrayValue retrieves the value at key.
+func (s *Structure) GetArrayValue(key string) ([]any, error) {
+	cKey := C.CString(key)
+	defer C.free(unsafe.Pointer(cKey))
+	gVal := C.gst_structure_get_value(s.Instance(), cKey)
+	if gVal == nil {
+		return nil, fmt.Errorf("No value exists at %s", key)
+	}
+	panic("Not implemented")
+}
+
 // RemoveValue removes the value at the given key. If the key does not exist,
 // the structure is unchanged.
 func (s *Structure) RemoveValue(key string) {
