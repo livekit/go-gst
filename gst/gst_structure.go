@@ -155,21 +155,17 @@ func gValueArrayToGoFloat64Slice(gVal *C.GValue) []float64 {
 		return nil
 	}
 
-	// Step 1: Get the GValueArray from gVal
 	rms_arr := (*C.GValueArray)(C.g_value_get_boxed(gVal))
 	if rms_arr == nil {
 		return nil
 	}
 
-	length := int(rms_arr.n_values) // Assuming n_values is a field that gives you the number of elements
-
-	// Step 2: Iterate over the C array and fetch values one by one
+	length := int(rms_arr.n_values)
 	goSlice := make([]float64, length)
 	for i := 0; i < length; i++ {
-		value := (*C.double)(unsafe.Pointer(uintptr(unsafe.Pointer(rms_arr.values)) + uintptr(i)*unsafe.Sizeof(*rms_arr.values))) // Assuming values is a pointer to the first element in the array
-		goSlice[i] = float64(*value)
+		elem := C.g_value_array_get_nth(rms_arr, C.guint(i))
+		goSlice[i] = float64(C.g_value_get_double(elem))
 	}
-
 	return goSlice
 }
 
