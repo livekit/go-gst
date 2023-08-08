@@ -139,15 +139,38 @@ func (s *Structure) GetValue(key string) (interface{}, error) {
 	return glib.ValueFromNative(unsafe.Pointer(gVal)).GoValue()
 }
 
-// GetArrayValue retrieves the value at key.
-func (s *Structure) GetArrayValue(key string) ([]any, error) {
+// GetArrayValueFloat retrieves the values at key.
+func (s *Structure) GetArrayValueFloat(key string) ([]float64, error) {
 	cKey := C.CString(key)
 	defer C.free(unsafe.Pointer(cKey))
 	gVal := C.gst_structure_get_value(s.Instance(), cKey)
 	if gVal == nil {
 		return nil, fmt.Errorf("No value exists at %s", key)
 	}
-	panic("Not implemented")
+	return gValueArrayToGoFloat64Slice(gVal), nil
+}
+
+func gValueArrayToGoFloat64Slice(gVal *C.GValue) []float64 {
+	if gVal == nil {
+		return nil
+	}
+
+	// Step 1: Get the GValueArray from gVal
+	rms_arr := (*C.GValueArray)(C.g_value_get_boxed(gVal))
+	if rms_arr == nil {
+		return nil
+	}
+
+	length := int(rms_arr.n_values) // Assuming n_values is a field that gives you the number of elements
+
+	// Step 2: Iterate over the C array and fetch values one by one
+	goSlice := make([]float64, length)
+	for i := 0; i < length; i++ {
+		value := (*C.double)(unsafe.Pointer(uintptr(unsafe.Pointer(rms_arr.values)) + uintptr(i)*unsafe.Sizeof(*rms_arr.values))) // Assuming values is a pointer to the first element in the array
+		goSlice[i] = float64(*value)
+	}
+
+	return goSlice
 }
 
 // RemoveValue removes the value at the given key. If the key does not exist,
