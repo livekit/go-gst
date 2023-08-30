@@ -43,6 +43,10 @@ type Buffer struct {
 // FromGstBufferUnsafeNone wraps the given buffer, sinking any floating references, and places
 // a finalizer on the wrapped Buffer.
 func FromGstBufferUnsafeNone(buf unsafe.Pointer) *Buffer {
+	if buf == nil {
+		return nil
+	}
+
 	wrapped := ToGstBuffer(buf)
 	wrapped.Ref()
 	runtime.SetFinalizer(wrapped, (*Buffer).Unref)
@@ -51,6 +55,10 @@ func FromGstBufferUnsafeNone(buf unsafe.Pointer) *Buffer {
 
 // FromGstBufferUnsafeFull wraps the given buffer without taking an additional reference.
 func FromGstBufferUnsafeFull(buf unsafe.Pointer) *Buffer {
+	if buf == nil {
+		return nil
+	}
+
 	wrapped := ToGstBuffer(buf)
 	runtime.SetFinalizer(wrapped, (*Buffer).Unref)
 	return wrapped
@@ -120,16 +128,16 @@ func NewBufferFromReader(rdr io.Reader) (*Buffer, error) {
 //
 // The prefix/padding must be filled with 0 if flags contains MemoryFlagZeroPrefixed and MemoryFlagZeroPadded respectively.
 //
-//   // Example
+//	 // Example
 //
-//   buf := gst.NewBufferFull(0, []byte("hello-world"), 1024, 0, 1024, func() {
-//       fmt.Println("buffer was destroyed")
-//   })
-//   if buf != nil {
-//       buf.Unref()
-//   }
+//	 buf := gst.NewBufferFull(0, []byte("hello-world"), 1024, 0, 1024, func() {
+//	     fmt.Println("buffer was destroyed")
+//	 })
+//	 if buf != nil {
+//	     buf.Unref()
+//	 }
 //
-//  // > buffer was destroyed
+//	// > buffer was destroyed
 func NewBufferFull(flags MemoryFlags, data []byte, maxSize, offset, size int64, notifyFunc func()) *Buffer {
 	var notifyData unsafe.Pointer
 	var gnotifyFunc C.GDestroyNotify
@@ -228,27 +236,26 @@ func (b *Buffer) OffsetEnd() int64 { return int64(b.Instance().offset_end) }
 // parameters are passed to the MetaInfo's init function, and as such will only work
 // for MetaInfo objects created from the go runtime.
 //
-//   // Example
+//	// Example
 //
-//   metaInfo := gst.RegisterMeta(glib.TypeFromName("MyObjectType"), "my-meta", 1024, &gst.MetaInfoCallbackFuncs{
-//       InitFunc: func(params interface{}, buffer *gst.Buffer) bool {
-//           paramStr := params.(string)
-//           fmt.Println("Buffer initialized with params:", paramStr)
-//           return true
-//       },
-//       FreeFunc: func(buffer *gst.Buffer) {
-//           fmt.Println("Buffer was destroyed")
-//       },
-//   })
+//	metaInfo := gst.RegisterMeta(glib.TypeFromName("MyObjectType"), "my-meta", 1024, &gst.MetaInfoCallbackFuncs{
+//	    InitFunc: func(params interface{}, buffer *gst.Buffer) bool {
+//	        paramStr := params.(string)
+//	        fmt.Println("Buffer initialized with params:", paramStr)
+//	        return true
+//	    },
+//	    FreeFunc: func(buffer *gst.Buffer) {
+//	        fmt.Println("Buffer was destroyed")
+//	    },
+//	})
 //
-//   buf := gst.NewEmptyBuffer()
-//   buf.AddMeta(metaInfo, "hello world")
+//	buf := gst.NewEmptyBuffer()
+//	buf.AddMeta(metaInfo, "hello world")
 //
-//   buf.Unref()
+//	buf.Unref()
 //
-//   // > Buffer initialized with params: hello world
-//   // > Buffer was destroyed
-//
+//	// > Buffer initialized with params: hello world
+//	// > Buffer was destroyed
 func (b *Buffer) AddMeta(info *MetaInfo, params interface{}) *Meta {
 	meta := C.gst_buffer_add_meta(b.Instance(), info.Instance(), (C.gpointer)(gopointer.Save(params)))
 	if meta == nil {
