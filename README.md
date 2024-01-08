@@ -1,3 +1,5 @@
+Deprecated. Use the official [go-gst](https://github.com/go-gst/go-gst) instead.
+
 # go-gst
 
 Go bindings for the GStreamer C libraries
