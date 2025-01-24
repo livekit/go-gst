@@ -62,6 +62,10 @@ func wrapAllocationParams(obj *C.GstAllocationParams) *AllocationParams {
 	return &AllocationParams{ptr: obj}
 }
 
+func wrapMpagtsSection(section *C.GstMpegtsSection) *MpegtsSection {
+	return &MpegtsSection{section: section}
+}
+
 // Marshallers
 
 func registerMarshalers() {

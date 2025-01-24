@@ -506,3 +506,12 @@ func (m *Message) ParseHaveContext() *Context {
 	C.gst_message_parse_have_context(m.Instance(), &ctx)
 	return FromGstContextUnsafeFull(unsafe.Pointer(ctx))
 }
+
+func (m *Message) ParseMpegtsSection() *MpegtsSection {
+	ptr := C.gst_message_parse_mpegts_section(m.Instance())
+	if ptr == nil {
+		return nil
+	}
+
+	return FromGstMpegtsSectionUnsafeFull(unsafe.Pointer(ptr))
+}
