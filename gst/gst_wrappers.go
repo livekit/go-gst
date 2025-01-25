@@ -62,7 +62,15 @@ func wrapAllocationParams(obj *C.GstAllocationParams) *AllocationParams {
 	return &AllocationParams{ptr: obj}
 }
 
-func wrapMpagtsSection(section *C.GstMpegtsSection) *MpegtsSection {
+func wrapMpegtsSCTESIT(scteIt *C.GstMpegtsSCTESIT) *MpegtsSCTESIT {
+	return &MpegtsSCTESIT{scteIt: scteIt}
+}
+
+func wrapMpegtsSCTESpliceEvent(spliceEv *C.GstMpegtsSCTESpliceEvent) *MpegtsSCTESpliceEvent {
+	return &MpegtsSCTESpliceEvent{spliceEv: spliceEv}
+}
+
+func wrapMpegtsSection(section *C.GstMpegtsSection) *MpegtsSection {
 	return &MpegtsSection{section: section}
 }
 

@@ -25,7 +25,7 @@ func FromGstMpegtsSectionUnsafeFull(section unsafe.Pointer) *MpegtsSection {
 // ToGstMpegtsSection converts the given pointer into a MpegtsSection without affecting the ref count or
 // placing finalizers.
 func ToGstMpegtsSection(section unsafe.Pointer) *MpegtsSection {
-	return wrapMpagtsSection((*C.GstMpegtsSection)(section))
+	return wrapMpegtsSection((*C.GstMpegtsSection)(section))
 }
 
 // Instance returns the underlying GstMpegtsSection instance.
@@ -42,4 +42,57 @@ func (m *MpegtsSection) Unref() { C.mpegtsSectionUnref(m.Instance()) }
 func (m *MpegtsSection) Ref() *MpegtsSection {
 	C.mpegtsSectionRef(m.Instance())
 	return m
+}
+
+func (m *MpegtsSection) GetSCTESIT() *MpegtsSCTESIT {
+	scteIt := C.gst_mpegts_section_get_scte_sit(m.Instance())
+	if scteIt == nil {
+		return nil
+	}
+
+	ret := ToGstMpegtsSCTEIT(unsafe.Pointer(scteIt))
+
+	// Take a reference on the underlying GstMpegtsSection to ensure that the parsed table stays vaild until MpegtsSCTESIT gets finalized
+	ret.section = m
+
+	return ret
+}
+
+// MpegtsSCTESIT is a go representation of a SCTE SIT MpegTS section
+type MpegtsSCTESIT struct {
+	scteIt  *C.GstMpegtsSCTESIT
+	section *MpegtsSection // keep a reference to the underlying MpegTSSection object to make sure the GstMpegtsSCTEIT doesn't get freed as it is not independently reference counted
+}
+
+// ToGstMpegtsSCTEIT converts the given pointer into a MpegtsSCTESIT without affecting the ref count or
+// placing finalizers (GstMpegtsSCTESIT is not a reference counted object)
+func ToGstMpegtsSCTEIT(scteIt unsafe.Pointer) *MpegtsSCTESIT {
+	return wrapMpegtsSCTESIT((*C.GstMpegtsSCTESIT)(scteIt))
+}
+
+// Instance returns the underlying GstMpegtsSCTESIT instance.
+func (m *MpegtsSCTESIT) Instance() *C.GstMpegtsSCTESIT {
+	return m.scteIt
+}
+
+// MpegtsSCTESpliceEvent is a go representation of a SCTE Splice event
+type MpegtsSCTESpliceEvent struct {
+	spliceEv *C.GstMpegtsSCTESpliceEvent
+	scteIt   *MpegtsSCTESIT // keep a reference to the underlying MpegtsSCTESIT to make sure the GstMpegtsSCTEIT doesn't get freed as it is not independently reference counted
+}
+
+// ToMpegtsSCTESpliceEvent converts the given pointer into a MpegtsSCTESpliceEvent without affecting the ref count or
+// placing finalizers (GstMpegtsSCTESpliceEvent is not a reference counted object)
+func ToGstMpegtsSCTESpliceEvent(spliceEv unsafe.Pointer) *MpegtsSCTESpliceEvent {
+	return wrapMpegtsSCTESpliceEvent((*C.GstMpegtsSCTESpliceEvent)(spliceEv))
+}
+
+// Instance returns the underlying GstMpegtsSCTESIT instance.
+func (ev *MpegtsSCTESpliceEvent) Instance() *C.GstMpegtsSCTESpliceEvent {
+	//return *C.GstMpegtsSCTESpliceEvent(unsafe.Pointer(ev.spliceEv))
+	return ev.spliceEv
+}
+
+func (ev *MpegtsSCTESpliceEvent) ProgramSpliceTimeSpecified() bool {
+	return gobool(ev.Instance().program_splice_time_specified)
 }
