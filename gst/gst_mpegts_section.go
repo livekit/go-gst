@@ -44,13 +44,17 @@ func (m *MpegtsSection) Ref() *MpegtsSection {
 	return m
 }
 
+func (m *MpegtsSection) SectionType() MpegtsSectionType {
+	return MpegtsSectionType(m.Instance().section_type)
+}
+
 func (m *MpegtsSection) GetSCTESIT() *MpegtsSCTESIT {
-	scteIt := C.gst_mpegts_section_get_scte_sit(m.Instance())
-	if scteIt == nil {
+	scteSit := C.gst_mpegts_section_get_scte_sit(m.Instance())
+	if scteSit == nil {
 		return nil
 	}
 
-	ret := ToGstMpegtsSCTEIT(unsafe.Pointer(scteIt))
+	ret := ToGstMpegtsSCTESIT(unsafe.Pointer(scteSit))
 
 	// Take a reference on the underlying GstMpegtsSection to ensure that the parsed table stays vaild until MpegtsSCTESIT gets finalized
 	ret.section = m
@@ -60,25 +64,50 @@ func (m *MpegtsSection) GetSCTESIT() *MpegtsSCTESIT {
 
 // MpegtsSCTESIT is a go representation of a SCTE SIT MpegTS section
 type MpegtsSCTESIT struct {
-	scteIt  *C.GstMpegtsSCTESIT
-	section *MpegtsSection // keep a reference to the underlying MpegTSSection object to make sure the GstMpegtsSCTEIT doesn't get freed as it is not independently reference counted
+	scteSit *C.GstMpegtsSCTESIT
+	section *MpegtsSection // keep a reference to the underlying MpegTSSection object to make sure the GstMpegtsSCTESIT doesn't get freed as it is not independently reference counted
 }
 
-// ToGstMpegtsSCTEIT converts the given pointer into a MpegtsSCTESIT without affecting the ref count or
+// ToGstMpegtsSCTESIT converts the given pointer into a MpegtsSCTESIT without affecting the ref count or
 // placing finalizers (GstMpegtsSCTESIT is not a reference counted object)
-func ToGstMpegtsSCTEIT(scteIt unsafe.Pointer) *MpegtsSCTESIT {
-	return wrapMpegtsSCTESIT((*C.GstMpegtsSCTESIT)(scteIt))
+func ToGstMpegtsSCTESIT(scteSit unsafe.Pointer) *MpegtsSCTESIT {
+	return wrapMpegtsSCTESIT((*C.GstMpegtsSCTESIT)(scteSit))
 }
 
 // Instance returns the underlying GstMpegtsSCTESIT instance.
 func (m *MpegtsSCTESIT) Instance() *C.GstMpegtsSCTESIT {
-	return m.scteIt
+	return m.scteSit
+}
+
+func (m *MpegtsSCTESIT) SpliceTimeSpecified() bool {
+	return gobool(m.Instance().splice_time_specified)
+}
+
+func (m *MpegtsSCTESIT) SpliceTime() uint64 {
+	return uint64(m.Instance().splice_time)
+}
+
+func (m *MpegtsSCTESIT) Splices() []*MpegtsSCTESpliceEvent {
+	if m.Instance().splices == nil {
+		return nil
+	}
+
+	ret := []*MpegtsSCTESpliceEvent{}
+	for i := uint(0); i < uint(m.Instance().splices.len); i++ {
+		ptr := (*C.GstMpegtsSCTESpliceEvent)(unsafe.Pointer(uintptr(unsafe.Pointer(m.Instance().splices.pdata)) + unsafe.Sizeof(*m.Instance().splices.pdata)*uintptr(i)))
+		obj := ToGstMpegtsSCTESpliceEvent(unsafe.Pointer(ptr))
+		obj.scteSit = m
+
+		ret = append(ret, obj)
+	}
+
+	return ret
 }
 
 // MpegtsSCTESpliceEvent is a go representation of a SCTE Splice event
 type MpegtsSCTESpliceEvent struct {
 	spliceEv *C.GstMpegtsSCTESpliceEvent
-	scteIt   *MpegtsSCTESIT // keep a reference to the underlying MpegtsSCTESIT to make sure the GstMpegtsSCTEIT doesn't get freed as it is not independently reference counted
+	scteSit  *MpegtsSCTESIT // keep a reference to the underlying MpegtsSCTESIT to make sure the GstMpegtsSCTESIT doesn't get freed as it is not independently reference counted
 }
 
 // ToMpegtsSCTESpliceEvent converts the given pointer into a MpegtsSCTESpliceEvent without affecting the ref count or
@@ -89,10 +118,25 @@ func ToGstMpegtsSCTESpliceEvent(spliceEv unsafe.Pointer) *MpegtsSCTESpliceEvent 
 
 // Instance returns the underlying GstMpegtsSCTESIT instance.
 func (ev *MpegtsSCTESpliceEvent) Instance() *C.GstMpegtsSCTESpliceEvent {
-	//return *C.GstMpegtsSCTESpliceEvent(unsafe.Pointer(ev.spliceEv))
 	return ev.spliceEv
+}
+
+func (ev *MpegtsSCTESpliceEvent) SpliceEventId() uint32 {
+	return uint32(ev.Instance().splice_event_id)
+}
+
+func (ev *MpegtsSCTESpliceEvent) OutOfNetworkIndicator() bool {
+	return gobool(ev.Instance().out_of_network_indicator)
+}
+
+func (ev *MpegtsSCTESpliceEvent) SpliceImmediateFlag() bool {
+	return gobool(ev.Instance().splice_immediate_flag)
 }
 
 func (ev *MpegtsSCTESpliceEvent) ProgramSpliceTimeSpecified() bool {
 	return gobool(ev.Instance().program_splice_time_specified)
+}
+
+func (ev *MpegtsSCTESpliceEvent) ProgramSpliceTime() uint64 {
+	return uint64(ev.Instance().program_splice_time)
 }
