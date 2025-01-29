@@ -1078,4 +1078,20 @@ const (
 	MpegtsSectionATSCEIT  MpegtsSectionType = C.GST_MPEGTS_SECTION_ATSC_EIT  // (16) – ATSC Event Information Table (A65)
 	MpegtsSectionATSCSTT  MpegtsSectionType = C.GST_MPEGTS_SECTION_ATSC_STT  // (17) – ATSC System Time Table (A65)
 	MpegtsSectionATSCRRT  MpegtsSectionType = C.GST_MPEGTS_SECTION_ATSC_RRT  // (18) – ATSC Rating Region Table (A65)
+	MpegtsSectionSCTESIT  MpegtsSectionType = C.GST_MPEGTS_SECTION_SCTE_SIT  // (19) - SCTE Splice Information Table (SCTE-35)
+)
+
+// MpegtsSCTESpliceCommandType represents a GstMpegtsSCTESpliceCommandType
+type MpegtsSCTESpliceCommandType int
+
+// Type castig of GstMpegtsSCTESpliceCommandType
+// For more informartion see: https://gstreamer.freedesktop.org/documentation/mpegts/gst-scte-section.html?gi-language=c
+
+const (
+	MpegtsSCTESpliceCommandNull      MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_NULL      // (0)
+	MpegtsSCTESpliceCommandSchedule  MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_SCHEDULE  // (4)
+	MpegtsSCTESpliceCommandInsert    MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_INSERT    // (5)
+	MpegtsSCTESpliceCommandTime      MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_TIME      // (6)
+	MpegtsSCTESpliceCommandBandwidth MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_BANDWIDTH // (7)
+	MpegtsSCTESpliceCommandPrivate   MpegtsSCTESpliceCommandType = C.GST_MTS_SCTE_SPLICE_COMMAND_PRIVATE   // (255)
 )

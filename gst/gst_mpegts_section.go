@@ -79,6 +79,10 @@ func (m *MpegtsSCTESIT) Instance() *C.GstMpegtsSCTESIT {
 	return m.scteSit
 }
 
+func (m *MpegtsSCTESIT) SpliceCommandType() MpegtsSCTESpliceCommandType {
+	return MpegtsSCTESpliceCommandType(m.Instance().splice_command_type)
+}
+
 func (m *MpegtsSCTESIT) SpliceTimeSpecified() bool {
 	return gobool(m.Instance().splice_time_specified)
 }
@@ -94,7 +98,7 @@ func (m *MpegtsSCTESIT) Splices() []*MpegtsSCTESpliceEvent {
 
 	ret := []*MpegtsSCTESpliceEvent{}
 	for i := uint(0); i < uint(m.Instance().splices.len); i++ {
-		ptr := (*C.GstMpegtsSCTESpliceEvent)(unsafe.Pointer(uintptr(unsafe.Pointer(m.Instance().splices.pdata)) + unsafe.Sizeof(*m.Instance().splices.pdata)*uintptr(i)))
+		ptr := *(**C.GstMpegtsSCTESpliceEvent)(unsafe.Pointer(uintptr(unsafe.Pointer(m.Instance().splices.pdata)) + unsafe.Sizeof(*m.Instance().splices.pdata)*uintptr(i)))
 		obj := ToGstMpegtsSCTESpliceEvent(unsafe.Pointer(ptr))
 		obj.scteSit = m
 
@@ -131,6 +135,10 @@ func (ev *MpegtsSCTESpliceEvent) OutOfNetworkIndicator() bool {
 
 func (ev *MpegtsSCTESpliceEvent) SpliceImmediateFlag() bool {
 	return gobool(ev.Instance().splice_immediate_flag)
+}
+
+func (ev *MpegtsSCTESpliceEvent) ProgramSpliceFlag() bool {
+	return gobool(ev.Instance().program_splice_flag)
 }
 
 func (ev *MpegtsSCTESpliceEvent) ProgramSpliceTimeSpecified() bool {
