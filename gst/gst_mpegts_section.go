@@ -129,6 +129,10 @@ func (ev *MpegtsSCTESpliceEvent) SpliceEventId() uint32 {
 	return uint32(ev.Instance().splice_event_id)
 }
 
+func (ev *MpegtsSCTESpliceEvent) SpliceEventCancelIndicator() bool {
+	return gobool(ev.Instance().splice_event_cancel_indicator)
+}
+
 func (ev *MpegtsSCTESpliceEvent) OutOfNetworkIndicator() bool {
 	return gobool(ev.Instance().out_of_network_indicator)
 }

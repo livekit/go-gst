@@ -507,6 +507,7 @@ func (m *Message) ParseHaveContext() *Context {
 	return FromGstContextUnsafeFull(unsafe.Pointer(ctx))
 }
 
+// ParseMpegtsSection parses a MPEG TS section message
 func (m *Message) ParseMpegtsSection() *MpegtsSection {
 	ptr := C.gst_message_parse_mpegts_section(m.Instance())
 	if ptr == nil {
