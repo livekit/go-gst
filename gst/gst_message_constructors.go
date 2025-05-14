@@ -163,7 +163,7 @@ func NewElementMessage(src GstObjectHolder, structure *Structure) *Message {
 	if structure == nil {
 		return FromGstMessageUnsafeFull(unsafe.Pointer(C.gst_message_new_element(srcObj, nil)))
 	}
-	return FromGstMessageUnsafeFull(unsafe.Pointer(C.gst_message_new_element(srcObj, structure.Instance())))
+	return FromGstMessageUnsafeFull(unsafe.Pointer(C.gst_message_new_element(srcObj, structure.copy())))
 }
 
 // NewEOSMessage creates a new eos message. This message is generated and posted in the sink elements of a Bin. The bin will only forward
